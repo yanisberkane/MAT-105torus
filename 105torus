@@ -1,0 +1,136 @@
+#!/usr/bin/python3
+
+##
+## EPITECH PROJECT, 2021
+## B-MAT-100-PAR-1-1-105torus-yanis.berkane
+## File description:
+## 105torus
+##
+
+import sys
+import math
+
+class Compute:
+    def __init__(self):
+        self.a0 = float(sys.argv[2])
+        self.a1 = float(sys.argv[3])
+        self.a2 = float(sys.argv[4])
+        self.a3 = float(sys.argv[5])
+        self.a4 = float(sys.argv[6])
+        self.n = int(sys.argv[7])
+        self.choose_opt()
+
+    def get_function_img(self, x):
+        img = (self.a4 * (x**4)) + (self.a3 * (x**3)) + (self.a2 * (x**2)) + (self.a1 * x) + self.a0
+        return img
+
+    def get_deriv_img(self, x):
+        img = (4 * self.a4 * (x**3)) + (3 * self.a3 * (x**2)) + (2 * self.a2 * x) + self.a1
+        return img
+
+    def get_midpoint(self, a, b):
+        c = (a + b) / 2
+        return c
+
+    def compute_bisection(self):
+        a = 0
+        b = 1
+        midpoint = self.get_midpoint(a, b)
+        precision = round(self.n)
+        iterator = 0
+
+        print(f"x = {midpoint}")
+        while (abs(self.get_function_img(midpoint)) > pow(10, -self.n)):
+            if (self.get_function_img(a) * self.get_function_img(midpoint) < 0):
+                b = midpoint
+            else:
+                a = midpoint
+            midpoint = self.get_midpoint(a, b)
+            iterator += 1
+            if (iterator > 10000):
+                sys.exit(84)
+            if (self.get_decimals_len(midpoint) >= precision):
+                print(f"x = {midpoint:.{precision}f}")
+            else:
+                print(f"x = {round(midpoint, precision)}")
+        sys.exit(0)
+
+    def get_decimals_len(self, nb):
+        ct = 0
+
+        while (nb != math.floor(nb)):
+            nb = nb * 10
+            ct = ct + 1
+        return ct
+
+    def compute_newton(self):
+        a = 0.5
+        precision = round(self.n)
+        iterator = 0
+
+        print(f"x = {a}")
+        while (abs(self.get_function_img(a)) > pow(10, -self.n)):
+            if (self.get_deriv_img(a) == 0):
+                sys.exit(84)
+            a = a - (self.get_function_img(a) / self.get_deriv_img(a))
+            iterator += 1
+            if (iterator > 10000):
+                sys.exit(84)
+            if (self.get_decimals_len(a) >= precision):
+                print(f"x = {a:.{precision}f}")
+            else:
+                print(f"x = {round(a, precision)}")
+        sys.exit(0)
+
+    def compute_secant(self):
+        a = 0
+        b = 1
+        c = 0
+        precision = round(self.n)
+        iterator = 0
+
+        while (abs(self.get_function_img(c)) > pow(10, -self.n)):
+            if ((self.get_function_img(b) - self.get_function_img(a)) == 0):
+                sys.exit(84)
+            c = b - ((b - a) / (self.get_function_img(b) - self.get_function_img(a))) * self.get_function_img(b)
+            a = b
+            b = c
+            iterator += 1
+            if (iterator > 10000):
+                sys.exit(84)
+            if (self.get_decimals_len(c) >= precision):
+                print(f"x = {c:.{precision}f}")
+            else:
+                print(f"x = {round(c, precision)}")
+        sys.exit(0)
+
+    def choose_opt(self):
+        if (self.n <= 0):
+            sys.exit(84)
+        if (sys.argv[1] == "1"):
+            self.compute_bisection()
+        elif (sys.argv[1] == "2"):
+            self.compute_newton()
+        elif (sys.argv[1] == "3"):
+            self.compute_secant()
+        else:
+            sys.exit(84)
+
+def verif():
+    for i in range(1, 8):
+        if (sys.argv[i].lstrip('-').isdigit() == False):
+            return 1
+    return 0
+
+def main():
+    help = open("help.txt", "r")
+    read = help.readlines()
+    if (len(sys.argv) == 2 and sys.argv[1] == "-h"):
+        print("".join(read))
+    elif (len(sys.argv) != 8 or verif() == 1):
+        sys.exit(84)
+    else:
+        Compute()
+    sys.exit(0)
+
+main()
